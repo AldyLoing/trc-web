@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <!-- Main Card -->
+            <div class="card border-0 shadow-sm rounded-xl overflow-hidden">
+                <div class="card-header bg-gradient-success text-white py-4">
+                    <h2 class="h4 mb-0 text-center fw-semibold">
+                        <i class="fas fa-plus-circle me-2"></i>Add Waste Transaction
+                    </h2>
+                </div>
+                
+                <div class="card-body p-4 p-md-5">
+                    <!-- Notification Messages -->
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-pill shadow-sm mb-4" role="alert">
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %} me-2"></i>
+                                    <span>{{ message }}</span>
+                                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <!-- Transaction Form -->
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row g-4">
+                            {% for field in form %}
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <div class="form-group">
+                                        <label for="{{ field.id_for_label }}" class="form-label small text-muted mb-1">
+                                            {{ field.label }}
+                                        </label>
+                                        <div class="input-group input-group-lg">
+                                            <span class="input-group-text bg-light border-end-0">
+                                                {% if field.name == "user" %}
+                                                    <i class="fas fa-user text-primary"></i>
+                                                {% elif field.name == "category" %}
+                                                    <i class="fas fa-recycle text-success"></i>
+                                                {% elif field.name == "weight_kg" %}
+                                                    <i class="fas fa-weight text-warning"></i>
+                                                {% endif %}
+                                            </span>
+                                            {{ field }}
+                                        </div>
+                                        
+                                        {% for error in field.errors %}
+                                            <div class="invalid-feedback d-block small mt-1">
+                                                <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Info Note -->
+                        <div class="text-center mt-4 pt-3 border-top">
+                            <p class="small text-muted">
+                                <i class="fas fa-info-circle me-1"></i> Points are automatically calculated based on the waste category.
+                            </p>
+                        </div>
+
+                        <!-- Form Buttons -->
+                        <div class="d-grid gap-3 d-md-flex justify-content-md-end mt-4">
+                            <a href="{% url 'manage_transactions' %}" class="btn btn-outline-secondary rounded-pill px-4 py-2 me-md-2">
+                                <i class="fas fa-arrow-left me-2"></i>Back
+                            </a>
+                            <button type="submit" class="btn btn-success rounded-pill px-4 py-2 shadow-sm">
+                                <i class="fas fa-check-circle me-2"></i>Add Transaction
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Styles -->
+<style>
+    :root {
+        --success-color: #10b981;
+        --success-light: #d1fae5;
+        --primary-color: #3b82f6;
+        --warning-color: #f59e0b;
+    }
+    
+    body {
+        background-color: #f8fafc;
+        font-family: 'Inter', sans-serif;
+    }
+    
+    /* Card Styling */
+    .card {
+        border: none;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .card-header {
+        background: linear-gradient(135deg, var(--success-color), #059669);
+    }
+    
+    .rounded-xl {
+        border-radius: 1rem !important;
+    }
+    
+    /* Input Group Styles */
+    .input-group-lg .form-control,
+    .input-group-lg .input-group-text {
+        padding: 1rem 1.25rem;
+        font-size: 1rem;
+        border-radius: 0.5rem !important;
+    }
+    
+    .input-group-text {
+        transition: background-color 0.3s ease;
+    }
+    
+    .form-control:focus {
+        box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.15);
+        border-color: #a7f3d0;
+    }
+    
+    /* Button Styles */
+    .btn {
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-success {
+        background-color: var(--success-color);
+        border-color: var(--success-color);
+    }
+    
+    .btn-success:hover {
+        background-color: #059669;
+        transform: translateY(-2px);
+    }
+    
+    .btn-outline-secondary {
+        border-color: #e2e8f0;
+    }
+    
+    .btn-outline-secondary:hover {
+        background-color: #f1f5f9;
+    }
+    
+    /* Alert Styles */
+    .alert {
+        border: none;
+    }
+    
+    .alert-success {
+        background-color: var(--success-light);
+        color: #065f46;
+    }
+    
+    .alert-error {
+        background-color: #fee2e2;
+        color: #b91c1c;
+    }
+    
+    /* Animation */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .card {
+        animation: fadeIn 0.4s ease-out forwards;
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .btn {
+            width: 100%;
+        }
+    }
+</style>
+
+{% endblock %}

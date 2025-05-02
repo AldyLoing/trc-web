@@ -1,0 +1,317 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container py-5 animate__animated animate__fadeIn">
+    <!-- Header Section -->
+    <div class="text-center mb-5">
+        <div class="d-flex justify-content-center align-items-center mb-3">
+            <i class="fas fa-history fa-2x text-primary me-3"></i>
+            <h1 class="display-6 fw-bold text-gradient-primary mb-0">My Transaction History</h1>
+        </div>
+        <p class="text-muted">Track your waste collection and point redemption activities</p>
+    </div>
+
+    <!-- Total Points Card -->
+    <div class="card border-0 rounded-4 shadow-lg mb-5 bg-gradient-success text-white">
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="fw-light mb-1">Your Current Balance</h5>
+                    <h2 class="fw-bold mb-0">
+                        <span class="counter" data-target="{{ total_points }}">0</span> Points
+                    </h2>
+                    <small class="opacity-75">Earn more by recycling waste</small>
+                </div>
+                <div class="icon-shape bg-white-10 rounded-circle p-3">
+                    <i class="fas fa-coins fa-2x"></i>
+                </div>
+            </div>
+            <div class="progress mt-3 bg-white-10" style="height: 6px;">
+                <div class="progress-bar bg-white" style="width: 75%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Form -->
+    <div class="card border-0 rounded-4 shadow-sm mb-5">
+        <div class="card-body p-4">
+            <form method="GET" class="row g-3">
+                <div class="col-md-5">
+                    <label for="date" class="form-label small fw-bold text-muted">DATE RANGE</label>
+                    <div class="input-group border rounded-3">
+                        <span class="input-group-text bg-transparent border-0"><i class="fas fa-calendar text-primary"></i></span>
+                        <input type="date" name="date" class="form-control border-0" value="{{ date_filter }}" onfocus="this.parentElement.style.borderColor='#3b82f6'"
+                            onblur="this.parentElement.style.borderColor='#e2e8f0'">
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <label for="category" class="form-label small fw-bold text-muted">WASTE TYPE</label>
+                    <div class="input-group border rounded-3">
+                        <span class="input-group-text bg-transparent border-0"><i class="fas fa-recycle text-success"></i></span>
+                        <select name="category" class="form-select border-0" onfocus="this.parentElement.style.borderColor='#3b82f6'"
+                            onblur="this.parentElement.style.borderColor='#e2e8f0'">
+                            <option value="">All Categories</option>
+                            <option value="plastik" {% if category_filter == "plastik" %}selected{% endif %}>Plastic</option>
+                            <option value="kertas" {% if category_filter == "kertas" %}selected{% endif %}>Paper</option>
+                            <option value="logam" {% if category_filter == "logam" %}selected{% endif %}>Metal</option>
+                            <option value="organik" {% if category_filter == "organik" %}selected{% endif %}>Organic</option>
+                            <option value="minyak_jelantah" {% if category_filter == "minyak_jelantah" %}selected{% endif %}>Used Cooking Oil</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <div class="d-flex w-100 gap-2">
+                        <button type="submit" class="btn btn-primary rounded-3 flex-grow-1">
+                            <i class="fas fa-filter me-2"></i>Filter
+                        </button>
+                        <a href="{% url 'transaction_history' %}" class="btn btn-outline-secondary rounded-3">
+                            <i class="fas fa-sync-alt"></i>
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Download Button -->
+    <div class="d-flex justify-content-end mb-3">
+        <a href="{% url 'export_transactions_csv' %}" class="btn btn-outline-primary rounded-pill px-4">
+            <i class="fas fa-download me-2"></i>Export as CSV
+        </a>
+    </div>
+
+    <!-- Transaction Table -->
+    <div class="card border-0 rounded-4 shadow-sm mb-5">
+        <div class="card-body p-0">
+            <div class="d-flex justify-content-between align-items-center p-4 border-bottom">
+                <h5 class="fw-bold mb-0">
+                    <i class="fas fa-exchange-alt text-primary me-2"></i>Waste Collection History
+                </h5>
+                <span class="badge bg-primary-soft text-primary">{{ transactions.count }} records</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">Date</th>
+                            <th>Waste Type</th>
+                            <th class="text-end">Weight</th>
+                            <th class="text-end pe-4">Points</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaction in transactions %}
+                        <tr class="border-bottom">
+                            <td class="ps-4">{{ transaction.date|date:"d M Y" }}</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-shape bg-{{ transaction.category }}-soft rounded-circle me-3">
+                                        <i class="fas 
+                                            {% if transaction.category == 'plastik' %}fa-recycle text-primary{% endif %}
+                                            {% if transaction.category == 'kertas' %}fa-file-alt text-warning{% endif %}
+                                            {% if transaction.category == 'logam' %}fa-industry text-danger{% endif %}
+                                            {% if transaction.category == 'organik' %}fa-leaf text-success{% endif %}
+                                            {% if transaction.category == 'minyak_jelantah' %}fa-oil-can text-dark{% endif %}
+                                        "></i>
+                                    </div>
+                                    {{ transaction.get_category_display }}
+                                </div>
+                            </td>
+                            <td class="text-end">{{ transaction.weight_kg }} kg</td>
+                            <td class="text-success fw-bold text-end pe-4">+{{ transaction.points }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center py-5">
+                                <div class="py-4">
+                                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                    <h5 class="text-muted">No transactions found</h5>
+                                    <p class="text-muted small">Try adjusting your filters</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Redemption History -->
+    <div class="card border-0 rounded-4 shadow-sm">
+        <div class="card-body p-0">
+            <div class="d-flex justify-content-between align-items-center p-4 border-bottom">
+                <h5 class="fw-bold mb-0">
+                    <i class="fas fa-hand-holding-usd text-primary me-2"></i>Point Redemption History
+                </h5>
+                <span class="badge bg-primary-soft text-primary">{{ redemptions.count }} records</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">Date</th>
+                            <th class="text-end">Points</th>
+                            <th class="text-end pe-4">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for redemption in redemptions %}
+                        <tr class="border-bottom">
+                            <td class="ps-4">{{ redemption.requested_at|date:"d M Y" }}</td>
+                            <td class="text-danger fw-bold text-end">-{{ redemption.points }}</td>
+                            <td class="text-end pe-4">
+                                {% if redemption.status == "approved" %}
+                                    <span class="badge bg-success-soft text-success rounded-pill px-3 py-2">
+                                        <i class="fas fa-check-circle me-1"></i> Approved
+                                    </span>
+                                {% elif redemption.status == "pending" %}
+                                    <span class="badge bg-warning-soft text-warning rounded-pill px-3 py-2">
+                                        <i class="fas fa-clock me-1"></i> Pending
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-danger-soft text-danger rounded-pill px-3 py-2">
+                                        <i class="fas fa-times-circle me-1"></i> Rejected
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center py-5">
+                                <div class="py-4">
+                                    <i class="fas fa-gift fa-3x text-muted mb-3"></i>
+                                    <h5 class="text-muted">No redemption history</h5>
+                                    <p class="text-muted small">You haven't redeemed any points yet</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Styles -->
+<style>
+    :root {
+        --primary: #3b82f6;
+        --primary-soft: #e0e7ff;
+        --success: #10b981;
+        --success-soft: #d1fae5;
+        --warning: #f59e0b;
+        --warning-soft: #fef3c7;
+        --danger: #ef4444;
+        --danger-soft: #fee2e2;
+        --info: #0ea5e9;
+        --info-soft: #e0f2fe;
+        --plastik-soft: #dbeafe;
+        --kertas-soft: #fef3c7;
+        --logam-soft: #fee2e2;
+        --organik-soft: #d1fae5;
+        --minyak_jelantah-soft: #e5e7eb;
+    }
+    
+    body {
+        background-color: #f8fafc;
+        font-family: 'Inter', sans-serif;
+    }
+    
+    .text-gradient-primary {
+        background: linear-gradient(90deg, #3b82f6, #10b981);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .bg-gradient-success {
+        background: linear-gradient(135deg, #10b981, #0ea5e9);
+    }
+    
+    .card {
+        border: none;
+        overflow: hidden;
+    }
+    
+    .icon-shape {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+    }
+    
+    .table-hover tbody tr:hover {
+        background-color: #f8fafc;
+    }
+    
+    .badge {
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
+    
+    .bg-white-10 {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .animate__animated {
+        animation-duration: 0.5s;
+    }
+    
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 1.5rem !important;
+        }
+        
+        .table-responsive {
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+    }
+</style>
+
+<!-- Animation and Scripts -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
+<script>
+    // Counter animation for points
+    const counters = document.querySelectorAll('.counter');
+    const speed = 200;
+    
+    counters.forEach(counter => {
+        const target = +counter.getAttribute('data-target');
+        const count = +counter.innerText;
+        const increment = target / speed;
+        
+        if (count < target) {
+            counter.innerText = 0;
+            const updateCount = () => {
+                const current = +counter.innerText;
+                if (current < target) {
+                    counter.innerText = Math.ceil(current + increment);
+                    setTimeout(updateCount, 1);
+                } else {
+                    counter.innerText = target;
+                }
+            };
+            updateCount();
+        }
+    });
+    
+    // Input focus effects
+    const inputs = document.querySelectorAll('input, select');
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.style.borderColor = '#3b82f6';
+            this.parentElement.style.boxShadow = '0 0 0 0.25rem rgba(59, 130, 246, 0.15)';
+        });
+        input.addEventListener('blur', function() {
+            this.parentElement.style.borderColor = '#e2e8f0';
+            this.parentElement.style.boxShadow = 'none';
+        });
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+
+<div class="container py-5 animate__animated animate__fadeIn">
+    <!-- Header Section -->
+    <div class="text-center mb-5">
+        <div class="d-flex justify-content-center align-items-center mb-3">
+            <i class="fas fa-gift fa-2x text-gradient-primary me-3"></i>
+            <h1 class="display-6 fw-bold text-gradient-primary mb-0">Redeem Your Points</h1>
+        </div>
+        <p class="text-muted">Exchange your recycling points for exciting rewards</p>
+    </div>
+
+    <!-- Points Balance Card -->
+    <div class="card border-0 rounded-4 shadow-lg mb-5 bg-gradient-success text-white">
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="fw-light mb-1">Available Balance</h5>
+                    <h2 class="fw-bold mb-0">
+                        <i class="fas fa-coins me-2"></i>
+                        <span class="counter" data-target="{{ total_points|intcomma }}">0</span> Points
+                    </h2>
+                    <small class="opacity-75">Minimum 50 points required for redemption</small>
+                </div>
+                <div class="icon-shape bg-white-10 rounded-circle p-3">
+                    <i class="fas fa-wallet fa-2x"></i>
+                </div>
+            </div>
+            <div class="progress mt-3 bg-white-10" style="height: 6px;">
+                <div class="progress-bar bg-white" style="width: {% widthratio total_points 1000 100 %}%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Insufficient Points Alert -->
+    {% if total_points < 50 %}
+    <div class="alert alert-warning-soft border-0 rounded-4 d-flex align-items-center mb-5" role="alert">
+        <div class="icon-shape bg-warning-soft rounded-circle me-3">
+            <i class="fas fa-exclamation-circle text-warning"></i>
+        </div>
+        <div>
+            <h6 class="fw-bold mb-1">Insufficient Points</h6>
+            <p class="mb-0 small">You need at least <strong>50 points</strong> to redeem rewards</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Redeem Form Card -->
+    <div class="card border-0 rounded-4 shadow-sm mb-5">
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-bold mb-0">
+                    <i class="fas fa-exchange-alt text-primary me-2"></i>Select Redemption
+                </h5>
+                <span class="badge bg-primary-soft text-primary">
+                    {{ point_options|length }} options available
+                </span>
+            </div>
+            
+            <form method="POST" id="redeem-form">
+                {% csrf_token %}
+                
+                <div class="mb-4">
+                    <label for="points" class="form-label small fw-bold text-muted">SELECT POINTS AMOUNT</label>
+                    <div class="input-group border rounded-3">
+                        <span class="input-group-text bg-transparent border-0">
+                            <i class="fas fa-coins text-warning"></i>
+                        </span>
+                        <select name="points" class="form-select border-0" required 
+                            onfocus="this.parentElement.style.borderColor='#3b82f6'"
+                            onblur="this.parentElement.style.borderColor='#e2e8f0'">
+                            {% if point_options %}
+                                {% for option in point_options %}
+                                    <option value="{{ option.points }}" data-amount="{{ option.amount }}">
+                                        {{ option.points|intcomma }} Points (Rp {{ option.amount|intcomma }})
+                                    </option>
+                                {% endfor %}
+                            {% else %}
+                                <option disabled>No points available for redemption</option>
+                            {% endif %}
+                        </select>
+                    </div>
+                    <div class="d-flex justify-content-end mt-2">
+                        <small class="text-muted">1 Point ≈ Rp 100</small>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary rounded-pill w-100 py-3" 
+                    {% if not point_options %}disabled{% endif %}>
+                    <i class="fas fa-exchange-alt me-2"></i>Redeem Now
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Messages (Toast Style) -->
+    {% if messages %}
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+        <div class="toast-container">
+            {% for message in messages %}
+            <div class="toast show align-items-center border-0 
+                {% if message.tags == 'error' %}bg-danger-soft{% else %}bg-success-soft{% endif %}" 
+                role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body d-flex align-items-center">
+                        <i class="fas 
+                            {% if message.tags == 'error' %}fa-times-circle text-danger{% else %}fa-check-circle text-success{% endif %} 
+                            me-2"></i>
+                        {{ message }}
+                    </div>
+                    <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Redemption History Button -->
+    <div class="d-grid">
+        <a href="{% url 'redemption_history' %}" class="btn btn-outline-primary rounded-pill py-3">
+            <i class="fas fa-history me-2"></i>View Redemption History
+        </a>
+    </div>
+</div>
+
+<!-- Custom Styles -->
+<style>
+    :root {
+        --primary: #3b82f6;
+        --primary-soft: #e0e7ff;
+        --success: #10b981;
+        --success-soft: #d1fae5;
+        --warning: #f59e0b;
+        --warning-soft: #fef3c7;
+        --danger: #ef4444;
+        --danger-soft: #fee2e2;
+    }
+    
+    body {
+        background-color: #f8fafc;
+        font-family: 'Inter', sans-serif;
+    }
+    
+    .text-gradient-primary {
+        background: linear-gradient(90deg, #3b82f6, #10b981);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .bg-gradient-success {
+        background: linear-gradient(135deg, #10b981, #0ea5e9);
+    }
+    
+    .card {
+        border: none;
+        overflow: hidden;
+    }
+    
+    .icon-shape {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+    }
+    
+    .badge {
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
+    
+    .bg-white-10 {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .btn {
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+    }
+    
+    .btn-outline-primary:hover {
+        background-color: var(--primary-soft);
+    }
+    
+    .animate__animated {
+        animation-duration: 0.5s;
+    }
+    
+    .toast {
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 1.5rem !important;
+        }
+    }
+</style>
+
+<!-- Animation and Scripts -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
+<script>
+    // Counter animation for points
+    document.addEventListener("DOMContentLoaded", function() {
+        // Points counter animation
+        const counter = document.querySelector('.counter');
+        if (counter) {
+            const target = +counter.getAttribute('data-target');
+            const count = +counter.innerText;
+            const increment = target / 100;
+            
+            if (count < target) {
+                counter.innerText = 0;
+                const updateCount = () => {
+                    const current = +counter.innerText;
+                    if (current < target) {
+                        counter.innerText = Math.ceil(current + increment);
+                        setTimeout(updateCount, 10);
+                    } else {
+                        counter.innerText = target.toLocaleString();
+                    }
+                };
+                updateCount();
+            }
+        }
+        
+        // Input focus effects
+        const inputs = document.querySelectorAll('input, select');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.borderColor = '#3b82f6';
+                this.parentElement.style.boxShadow = '0 0 0 0.25rem rgba(59, 130, 246, 0.15)';
+            });
+            input.addEventListener('blur', function() {
+                this.parentElement.style.borderColor = '#e2e8f0';
+                this.parentElement.style.boxShadow = 'none';
+            });
+        });
+        
+        // Form submission loading state
+        const form = document.getElementById('redeem-form');
+        if (form) {
+            form.addEventListener('submit', function() {
+                const btn = this.querySelector('button[type="submit"]');
+                if (btn) {
+                    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Processing...';
+                    btn.disabled = true;
+                }
+            });
+        }
+    });
+</script>
+
+{% endblock %}

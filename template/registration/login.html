@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login | Tonsea Recycle Center</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeSlideIn 0.8s ease-out forwards;
+        }
+
+        .login-container {
+            background: white;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+            width: 450px;
+            text-align: center;
+            opacity: 0;
+            transform: scale(0.9);
+            animation: zoomFadeIn 0.5s ease-out forwards 0.5s;
+        }
+
+        .login-container h2 {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .form-control {
+            border-radius: 6px;
+            height: 50px;
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background-color: #2c3e50;
+            border: none;
+            font-size: 16px;
+            padding: 12px;
+            border-radius: 6px;
+        }
+
+        .btn-primary:hover {
+            background-color: #1a252f;
+        }
+
+        .btn-secondary {
+            font-size: 14px;
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .forgot-password, .signup-link {
+            font-size: 14px;
+        }
+
+        /* Page Load Animation */
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Form Load Animation */
+        @keyframes zoomFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Alert Animation */
+        .alert {
+            opacity: 0;
+            transform: translateY(-10px);
+            animation: fadeInMessage 0.5s ease-out forwards;
+        }
+
+        @keyframes fadeInMessage {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <h2>Welcome Back</h2>
+    <p class="text-muted">Log in to your account</p>
+
+    <form method="post">
+        {% csrf_token %}
+
+        {% for field in form %}
+        <div class="mb-3">
+            <label class="form-label fw-semibold">
+                {% if field.name == "username" %} Username
+                {% elif field.name == "password" %} Password
+                {% else %} {{ field.label }} {% endif %}
+            </label>
+            <div class="input-group">
+                {% if field.name == "username" %}
+                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                    <input type="text" name="{{ field.name }}" class="form-control" placeholder="Enter your username">
+                {% elif field.name == "password" %}
+                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                    <input type="password" id="password" name="{{ field.name }}" class="form-control" placeholder="Enter your password">
+                    <span class="input-group-text toggle-password" data-target="password">
+                        <i class="fas fa-eye"></i>
+                    </span>
+                {% else %}
+                    <input type="{{ field.field.widget.input_type }}" name="{{ field.name }}" class="form-control" placeholder="{{ field.label }}">
+                {% endif %}
+            </div>
+        
+            {% for error in field.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+        
+        <button type="submit" class="btn btn-primary w-100">Login</button>
+
+        <div class="d-flex justify-content-between mt-3">
+            <a href="{% url 'index' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+            <a href="{% url 'password_reset' %}" class="forgot-password text-decoration-none">Forgot password?</a>
+        </div>
+
+        <div class="mt-3">
+            <small>Don't have an account? <a href="{% url 'signup' %}" class="signup-link text-decoration-none">Sign Up</a></small>
+        </div>
+    </form>
+</div>
+
+{% if messages %}
+<div class="container mt-3">
+    {% for message in messages %}
+    <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let togglePasswordButtons = document.querySelectorAll(".toggle-password");
+
+        togglePasswordButtons.forEach(button => {
+            button.addEventListener("click", function () {
+                let target = this.getAttribute("data-target");
+                let passwordField = document.getElementById(target);
+                let icon = this.querySelector("i");
+
+                if (passwordField.type === "password") {
+                    passwordField.type = "text";
+                    icon.classList.remove("fa-eye");
+                    icon.classList.add("fa-eye-slash");
+                } else {
+                    passwordField.type = "password";
+                    icon.classList.remove("fa-eye-slash");
+                    icon.classList.add("fa-eye");
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container py-5 animate__animated animate__fadeIn">
+    <!-- Header Section -->
+    <div class="text-center mb-5">
+        <div class="d-flex justify-content-center align-items-center mb-3">
+            <i class="fas fa-history fa-2x text-gradient-primary me-3"></i>
+            <h1 class="display-6 fw-bold text-gradient-primary mb-0">Redemption History</h1>
+        </div>
+        <p class="text-muted">Track your point redemption activities and status</p>
+    </div>
+
+    <!-- Total Redeemed Points Card -->
+    <div class="card border-0 rounded-4 shadow-lg mb-5 bg-gradient-danger text-white">
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="fw-light mb-1">Total Redeemed</h5>
+                    <h2 class="fw-bold mb-0">
+                        <i class="fas fa-coins me-2"></i>
+                        <span class="counter" data-target="{{ total_redeemed_points }}">0</span> Points
+                    </h2>
+                    <small class="opacity-75">All successful redemptions</small>
+                </div>
+                <div class="icon-shape bg-white-10 rounded-circle p-3">
+                    <i class="fas fa-exchange-alt fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Redemption History Table -->
+    <div class="card border-0 rounded-4 shadow-sm">
+        <div class="card-body p-0">
+            <div class="d-flex justify-content-between align-items-center p-4 border-bottom">
+                <h5 class="fw-bold mb-0">
+                    <i class="fas fa-list-check text-primary me-2"></i>Transaction Records
+                </h5>
+                <span class="badge bg-primary-soft text-primary">{{ redemptions.count }} records</span>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light sticky-top">
+                        <tr>
+                            <th class="ps-4">Points</th>
+                            <th>Status</th>
+                            <th class="pe-4">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for redemption in redemptions %}
+                        <tr class="border-bottom">
+                            <td class="ps-4 fw-bold text-danger">-{{ redemption.points }}</td>
+                            <td>
+                                {% if redemption.status == "pending" %}
+                                    <span class="badge bg-warning-soft text-warning rounded-pill px-3 py-2">
+                                        <i class="fas fa-clock me-1"></i> Pending
+                                    </span>
+                                {% elif redemption.status == "approved" %}
+                                    <span class="badge bg-primary-soft text-primary rounded-pill px-3 py-2">
+                                        <i class="fas fa-check-circle me-1"></i> Approved
+                                    </span>
+                                {% elif redemption.status == "completed" %}
+                                    <span class="badge bg-success-soft text-success rounded-pill px-3 py-2">
+                                        <i class="fas fa-check-double me-1"></i> Completed
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-danger-soft text-danger rounded-pill px-3 py-2">
+                                        <i class="fas fa-times-circle me-1"></i> Rejected
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="pe-4">{{ redemption.requested_at|date:"d M Y, H:i" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center py-5">
+                                <div class="py-4">
+                                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                    <h5 class="text-muted">No redemption history found</h5>
+                                    <p class="text-muted small">Start redeeming your points for exciting rewards</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Redeem More Points Button -->
+    <div class="d-grid mt-4">
+        <a href="{% url 'redeem_points' %}" class="btn btn-primary rounded-pill py-3">
+            <i class="fas fa-gift me-2"></i>Redeem More Points
+        </a>
+    </div>
+</div>
+
+<!-- Custom Styles -->
+<style>
+    :root {
+        --primary: #3b82f6;
+        --primary-soft: #e0e7ff;
+        --success: #10b981;
+        --success-soft: #d1fae5;
+        --warning: #f59e0b;
+        --warning-soft: #fef3c7;
+        --danger: #ef4444;
+        --danger-soft: #fee2e2;
+    }
+    
+    body {
+        background-color: #f8fafc;
+        font-family: 'Inter', sans-serif;
+    }
+    
+    .text-gradient-primary {
+        background: linear-gradient(90deg, #3b82f6, #10b981);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .bg-gradient-danger {
+        background: linear-gradient(135deg, #ef4444, #f97316);
+    }
+    
+    .card {
+        border: none;
+        overflow: hidden;
+    }
+    
+    .icon-shape {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+    }
+    
+    .table-hover tbody tr:hover {
+        background-color: #f8fafc;
+    }
+    
+    .badge {
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
+    
+    .bg-white-10 {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .sticky-top {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+    
+    .animate__animated {
+        animation-duration: 0.5s;
+    }
+    
+    .btn {
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+    }
+    
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 1.5rem !important;
+        }
+        
+        .table-responsive {
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+    }
+</style>
+
+<!-- Animation and Scripts -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
+<script>
+    // Counter animation for points
+    document.addEventListener("DOMContentLoaded", function() {
+        const counter = document.querySelector('.counter');
+        if (counter) {
+            const target = +counter.getAttribute('data-target');
+            const count = +counter.innerText;
+            const increment = target / 100;
+            
+            if (count < target) {
+                counter.innerText = 0;
+                const updateCount = () => {
+                    const current = +counter.innerText;
+                    if (current < target) {
+                        counter.innerText = Math.ceil(current + increment);
+                        setTimeout(updateCount, 10);
+                    } else {
+                        counter.innerText = target;
+                    }
+                };
+                updateCount();
+            }
+        }
+        
+        // Add pulse animation to pending status badges
+        const pendingBadges = document.querySelectorAll('.bg-warning-soft');
+        pendingBadges.forEach(badge => {
+            badge.classList.add('animate__animated', 'animate__pulse', 'animate__infinite');
+            badge.style.setProperty('--animate-duration', '2s');
+        });
+    });
+</script>
+
+{% endblock %}

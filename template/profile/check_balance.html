@@ -1,0 +1,375 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container py-4 animate__animated animate__fadeIn">
+    <!-- Header Section -->
+    <div class="text-center mb-5">
+        <div class="icon-wrapper bg-primary-soft mb-3 mx-auto">
+            <i class="fas fa-coins text-primary"></i>
+        </div>
+        <h1 class="h3 mb-2 fw-bold text-dark">Points Balance</h1>
+        <p class="text-muted">Track your recycling contributions and rewards</p>
+    </div>
+
+    <!-- Points Balance Card -->
+    <div class="card balance-card border-0 rounded-4 shadow-lg mb-5 overflow-hidden">
+        <div class="card-body text-center p-4">
+            <div class="balance-display mx-auto">
+                <div class="balance-icon">
+                    <i class="fas fa-coins"></i>
+                </div>
+                <div class="balance-text">
+                    <p class="text-muted mb-1">Your Current Balance</p>
+                    <h2 class="fw-bold mb-0" id="total-points">
+                        <span class="counter">{{ total_points }}</span> Points
+                    </h2>
+                </div>
+            </div>
+            <p class="text-muted mt-3 mb-0">
+                <i class="fas fa-gift me-2"></i>Redeem your points for exciting rewards
+            </p>
+        </div>
+    </div>
+
+    <!-- Points History -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="card-header bg-white py-3 border-bottom">
+            <div class="d-flex align-items-center">
+                <div class="icon-circle bg-primary-soft me-3">
+                    <i class="fas fa-history text-primary"></i>
+                </div>
+                <h5 class="mb-0 fw-semibold">Transaction History</h5>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">Category</th>
+                            <th class="text-center">Weight</th>
+                            <th class="text-center">Points</th>
+                            <th class="pe-4 text-end">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transaction-table-body">
+                        {% for transaction in transactions %}
+                        <tr class="animate__animated animate__fadeIn">
+                            <td class="ps-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="category-icon me-3">
+                                        <i class="fas 
+                                            {% if transaction.category == 'plastik' %}fa-recycle text-primary{% endif %}
+                                            {% if transaction.category == 'kertas' %}fa-file-alt text-warning{% endif %}
+                                            {% if transaction.category == 'logam' %}fa-industry text-danger{% endif %}
+                                            {% if transaction.category == 'organik' %}fa-leaf text-success{% endif %}
+                                            {% if transaction.category == 'minyak_jelantah' %}fa-oil-can text-dark{% endif %}
+                                        "></i>
+                                    </div>
+                                    <span>{{ transaction.get_category_display }}</span>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-gray-100 text-dark rounded-pill px-3 py-2">
+                                    {{ transaction.weight_kg }} kg
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-success-soft text-success rounded-pill px-3 py-2 fw-bold">
+                                    +{{ transaction.points }}
+                                </span>
+                            </td>
+                            <td class="pe-4 text-end">
+                                <small class="text-muted">{{ transaction.date|date:"d M Y" }}</small>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center py-5">
+                                <div class="empty-state">
+                                    <i class="fas fa-inbox fs-1 text-muted mb-3"></i>
+                                    <p class="text-muted mb-0">No transactions yet</p>
+                                    <small class="text-muted">Start recycling to earn points</small>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-color: #4e73df;
+        --primary-soft: #e3e9f8;
+        --success-color: #1cc88a;
+        --success-soft: #e3f8ee;
+        --light-gray: #f8f9fc;
+        --medium-gray: #e3e6f0;
+        --dark-gray: #5a5c69;
+    }
+    
+    body {
+        font-family: 'Poppins', 'Inter', sans-serif;
+        background-color: #f5f7fb;
+    }
+    
+    /* Icon Wrapper */
+    .icon-wrapper {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+    
+    .bg-primary-soft {
+        background-color: var(--primary-soft);
+    }
+    
+    .bg-success-soft {
+        background-color: var(--success-soft);
+    }
+    
+    .bg-gray-100 {
+        background-color: var(--light-gray);
+    }
+    
+    /* Balance Card */
+    .balance-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fc 100%);
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    .balance-display {
+        max-width: 300px;
+        position: relative;
+    }
+    
+    .balance-icon {
+        width: 80px;
+        height: 80px;
+        background-color: var(--primary-soft);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: var(--primary-color);
+        margin: 0 auto 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .balance-card:hover .balance-icon {
+        transform: scale(1.05) rotate(10deg);
+    }
+    
+    /* Counter Animation */
+    .counter {
+        display: inline-block;
+    }
+    
+    /* Table Styling */
+    .table {
+        margin-bottom: 0;
+    }
+    
+    .table thead th {
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+        color: var(--dark-gray);
+    }
+    
+    .table tbody tr {
+        transition: all 0.3s ease;
+        border-bottom: 1px solid rgba(0,0,0,0.03);
+    }
+    
+    .table tbody tr:hover {
+        background-color: rgba(0,0,0,0.02);
+    }
+    
+    .table tbody tr:last-child {
+        border-bottom: none;
+    }
+    
+    /* Category Icons */
+    .category-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background-color: rgba(0,0,0,0.03);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Empty State */
+    .empty-state {
+        padding: 2rem;
+        text-align: center;
+    }
+    
+    /* Animations */
+    .animate__animated {
+        animation-duration: 0.5s;
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .balance-icon {
+            width: 60px;
+            height: 60px;
+            font-size: 1.5rem;
+        }
+        
+        .table-responsive {
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        
+        .table thead {
+            display: none;
+        }
+        
+        .table tbody tr {
+            display: block;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .table tbody td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border: none;
+            text-align: right;
+        }
+        
+        .table tbody td::before {
+            content: attr(data-label);
+            font-weight: 600;
+            color: var(--dark-gray);
+            margin-right: auto;
+            padding-right: 1rem;
+            text-align: left;
+        }
+        
+        .table tbody td:first-child {
+            padding-top: 1rem;
+        }
+        
+        .table tbody td:last-child {
+            padding-bottom: 1rem;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Animate balance counter
+        function animateValue(id, start, end, duration) {
+            const obj = document.getElementById(id).querySelector('.counter');
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerHTML = Math.floor(progress * (end - start) + start);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+        
+        // Initial animation
+        animateValue("total-points", 0, {{ total_points }}, 1000);
+        
+        // Update balance function
+        function updateBalance() {
+            fetch("{% url 'check_balance' %}")
+                .then(response => response.json())
+                .then(data => {
+                    // Animate the counter when balance changes
+                    const currentBalance = parseInt(document.querySelector('.counter').textContent);
+                    if (currentBalance !== data.total_points) {
+                        animateValue("total-points", currentBalance, data.total_points, 500);
+                    }
+                    
+                    // Update transaction table
+                    let tbody = document.getElementById("transaction-table-body");
+                    tbody.innerHTML = "";
+                    
+                    if (data.transactions.length === 0) {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="4" class="text-center py-5">
+                                    <div class="empty-state">
+                                        <i class="fas fa-inbox fs-1 text-muted mb-3"></i>
+                                        <p class="text-muted mb-0">No transactions yet</p>
+                                        <small class="text-muted">Start recycling to earn points</small>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    } else {
+                        data.transactions.forEach(transaction => {
+                            let row = document.createElement('tr');
+                            row.className = 'animate__animated animate__fadeIn';
+                            row.innerHTML = `
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="category-icon me-3">
+                                            <i class="fas ${getCategoryIcon(transaction.category)}"></i>
+                                        </div>
+                                        <span>${transaction.category_display}</span>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-gray-100 text-dark rounded-pill px-3 py-2">
+                                        ${transaction.weight_kg} kg
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-success-soft text-success rounded-pill px-3 py-2 fw-bold">
+                                        +${transaction.points}
+                                    </span>
+                                </td>
+                                <td class="pe-4 text-end">
+                                    <small class="text-muted">${transaction.date}</small>
+                                </td>
+                            `;
+                            tbody.appendChild(row);
+                        });
+                    }
+                })
+                .catch(error => console.error("Error fetching balance:", error));
+        }
+        
+        // Helper function for category icons
+        function getCategoryIcon(category) {
+            switch(category) {
+                case 'plastik': return 'fa-recycle text-primary';
+                case 'kertas': return 'fa-file-alt text-warning';
+                case 'logam': return 'fa-industry text-danger';
+                case 'organik': return 'fa-leaf text-success';
+                case 'minyak_jelantah': return 'fa-oil-can text-dark';
+                default: return 'fa-question-circle';
+            }
+        }
+        
+        setInterval(updateBalance, 5000); // Update every 5 seconds
+    });
+</script>
+
+{% endblock %}

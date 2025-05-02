@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h2 class="text-center mb-4">Admin Profile Management</h2>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="card shadow-sm p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% for field in form %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">{{ field.label }}</label>
+                        <div class="input-group">
+                            {% if field.name == "username" %}
+                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                            {% elif field.name == "nik" %}
+                                <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                            {% elif field.name == "email" %}
+                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                            {% elif field.name == "nomor_hape" %}
+                                <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                            {% elif field.name == "address" %}
+                                <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                            {% endif %}
+                            {{ field }}
+                        </div>
+
+                        {% for error in field.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+
+                    <button type="submit" class="btn btn-success w-100">Simpan Perubahan</button>
+                </form>
+
+                <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary w-100 mt-3">Kembali ke Dashboard</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

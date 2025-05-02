@@ -1,0 +1,476 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <title>Tonsea Recycle Center</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-green: #2ecc71;
+            --dark-green: #27ae60;
+            --light-green: #d5f5e3;
+            --accent-yellow: #f1c40f;
+            --soft-gray: #f8f9fa;
+            --medium-gray: #e9ecef;
+            --dark-gray: #343a40;
+            --white: #ffffff;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--soft-gray);
+        }
+        
+
+        .navbar {
+            background-color: var(--white);
+            padding: 12px 0;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .navbar-brand {
+        font-weight: 700;
+        font-size: 1.5rem;
+        }
+
+        .navbar-brand i {
+        color: var(--gold-accent);
+        margin-right: 8px;
+        }
+
+        .nav-link {
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+        color: var(--gold-accent) !important;
+        }
+
+
+
+        .navbar-brand img {
+            height: 40px;
+            margin-right: 12px;
+            transition: var(--transition);
+        }
+
+        .navbar-brand:hover {
+            transform: translateY(-2px);
+        }
+
+        .navbar-brand span {
+            font-size: 1.25rem;
+            background: linear-gradient(to right, var(--dark-green), var(--primary-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .navbar-nav .nav-link {
+            color: var(--dark-gray) !important;
+            font-weight: 500;
+            font-size: 0.95rem;
+            padding: 8px 16px;
+            margin: 0 4px;
+            border-radius: 8px;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: var(--primary-green) !important;
+            background-color: var(--light-green);
+            transform: translateY(-2px);
+        }
+
+        .navbar-nav .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: var(--primary-green);
+            transition: var(--transition);
+        }
+
+        .navbar-nav .nav-link:hover::after {
+            width: 70%;
+        }
+
+        .nav-item.separator {
+            color: var(--medium-gray);
+            display: flex;
+            align-items: center;
+            padding: 0 4px;
+        }
+
+        .btn-outline-light {
+            border-color: var(--primary-green);
+            color: var(--primary-green);
+            font-weight: 500;
+            border-radius: 8px;
+            transition: var(--transition);
+            padding: 8px 16px;
+        }
+
+        .btn-outline-light:hover {
+            background-color: var(--primary-green);
+            color: var(--white);
+            box-shadow: var(--shadow-sm);
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background-color: var(--primary-green);
+            border-color: var(--primary-green);
+            font-weight: 500;
+            border-radius: 8px;
+            transition: var(--transition);
+            padding: 8px 20px;
+        }
+
+        .btn-success:hover {
+            background-color: var(--dark-green);
+            border-color: var(--dark-green);
+            box-shadow: var(--shadow-sm);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background-color: var(--accent-yellow);
+            border-color: var(--accent-yellow);
+            color: var(--dark-gray);
+            font-weight: 500;
+            border-radius: 8px;
+            transition: var(--transition);
+            padding: 8px 20px;
+        }
+
+        .btn-primary:hover {
+            background-color: #e6b800;
+            border-color: #e6b800;
+            box-shadow: var(--shadow-sm);
+            transform: translateY(-2px);
+            color: var(--dark-gray);
+        }
+
+        .dropdown-menu {
+            border: none;
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+            padding: 8px 0;
+            margin-top: 8px;
+        }
+
+        .dropdown-item {
+            padding: 10px 16px;
+            font-size: 0.9rem;
+            color: var(--dark-gray);
+            border-radius: 6px;
+            margin: 2px 8px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--light-green);
+            color: var(--primary-green);
+            transform: translateX(4px);
+        }
+
+        .dropdown-item i {
+            width: 20px;
+            text-align: center;
+            margin-right: 10px;
+            color: var(--primary-green);
+        }
+
+        .dropdown-divider {
+            margin: 6px 0;
+            border-color: var(--medium-gray);
+        }
+
+        .profile-icon {
+            width: 36px;
+            height: 36px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid var(--white);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .profile-icon:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 0 3px var(--light-green);
+        }
+
+        .content {
+            flex: 1;
+            padding-bottom: 80px;
+            padding-top: 30px;
+        }
+
+        footer {
+            background-color: var(--dark-green);
+            color: var(--white);
+            padding: 20px 0;
+            text-align: center;
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            font-size: 0.9rem;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        footer a {
+            color: var(--accent-yellow);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        footer a:hover {
+            color: var(--white);
+            text-decoration: underline;
+        }
+
+        .navbar-toggler {
+            border: none;
+            padding: 8px;
+            transition: var(--transition);
+        }
+
+        .navbar-toggler:focus {
+            box-shadow: none;
+        }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(46, 204, 113, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        @media (max-width: 992px) {
+            .navbar-nav .nav-link {
+                margin: 4px 0;
+                padding: 10px 16px;
+            }
+            
+            .nav-item.separator {
+                display: none;
+            }
+            
+            .dropdown-menu {
+                margin-top: 0;
+                border-radius: 0 0 12px 12px;
+            }
+        }
+
+        /* Animation for navbar on scroll */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="{% url 'index' %}">
+            <img src="{% static 'img/TRC.png' %}" alt="TRC Logo">
+            <span>Tonsea Recycle Center</span>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link nav-close" href="{% url 'index' %}#carouselExampleCaptions">Home</a>
+                </li>
+            
+                <li class="nav-item">
+                    <a class="nav-link nav-close" href="{% url 'index' %}#about-us">Tentang Kami</a>
+                </li>
+            
+                <li class="nav-item">
+                    <a class="nav-link nav-close" href="{% url 'index' %}#program">Program Kami</a>
+                </li>
+            
+                <li class="nav-item">
+                    <a class="nav-link nav-close" href="{% url 'index' %}#publication">Publikasi</a>
+                </li>
+            
+                <li class="nav-item">
+                    <a class="nav-link nav-close" href="{% url 'index' %}#location">Lokasi</a>
+                </li>
+            </ul>
+            
+            <ul class="navbar-nav">
+                  {% if user.is_authenticated %}
+                  <li class="nav-item dropdown">
+                    <button class="btn btn-outline-light dropdown-toggle d-flex align-items-center" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="{{ user.profile_picture.url }}" class="rounded-circle profile-icon me-2" alt="Profile Image">
+                        <span class="d-none d-md-inline text-dark">Profile</span>
+                    </button>
+                
+                    <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0" aria-labelledby="dropdownMenuButton1">
+                        {% if user.role == "admin_trc" %}
+                        <li><a class="dropdown-item d-flex align-items-center" href="{% url 'admin_dashboard' %}">
+                            <i class="fas fa-chart-line me-2"></i> Dashboard
+                        </a></li>
+                        <li><a class="dropdown-item d-flex align-items-center" href="{% url 'manage_users' %}">
+                            <i class="fas fa-users-cog me-2"></i> Manage Users
+                        </a></li>
+                        <li><a class="dropdown-item d-flex align-items-center" href="{% url 'manage_transactions' %}">
+                            <i class="fas fa-recycle me-2"></i> Manage Waste Transactions
+                        </a></li>
+                        <li><a class="dropdown-item d-flex align-items-center" href="{% url 'point_redemption_management' %}">
+                            <i class="fas fa-gift me-2"></i> Point Redemption Management
+                        </a></li>
+                        <li><a class="dropdown-item d-flex align-items-center" href="{% url 'update_profile' %}">
+                            <i class="fas fa-user-cog me-2"></i> Admin Profile Management
+                        </a></li>
+                        {% elif user.role == "member" %}
+                        <li><a class="dropdown-item d-flex align-items-center" href="{% url 'check_balance' %}">
+                            <i class="fas fa-wallet me-2"></i> Check Balance
+                        </a></li>
+                        <li><a class="dropdown-item d-flex align-items-center" href="{% url 'transaction_history' %}">
+                            <i class="fas fa-history me-2"></i> Transaction History
+                        </a></li>
+                        <li><a class="dropdown-item d-flex align-items-center" href="{% url 'redeem_points' %}">
+                            <i class="fas fa-gift me-2"></i> Points Redemption
+                        </a></li>
+                        <li><a class="dropdown-item d-flex align-items-center" href="{% url 'update_profile' %}">
+                            <i class="fas fa-user me-2"></i> Profile Management
+                        </a></li>
+                        {% endif %}
+                
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                          <form id="logout-form" action="{% url 'logout' %}" method="post">
+                            {% csrf_token %}
+                            <button type="button" class="dropdown-item d-flex align-items-center text-danger" id="logout-button">
+                              <i class="fas fa-sign-out-alt me-2"></i> Log Out
+                            </button>
+                          </form>
+                        </li>
+                      </ul>
+                    </li>
+                {% else %}
+                <li class="nav-item"><a class="btn btn-success me-2" href="{% url 'login' %}">Login</a></li>
+                <li class="nav-item"><a class="btn btn-primary" href="{% url 'signup' %}">Sign Up</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container content mt-5">
+    {% block content %}
+    {% endblock %}
+</div>
+
+<footer>
+    <div>@ 2025 Copyright: <a href="https://orderswebsite.vercel.app/">Orders</a></div>
+</footer>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+      // ✅ Navbar Collapse: Tutup setelah menu diklik
+      document.querySelectorAll(".nav-close").forEach(item => {
+          item.addEventListener("click", function () {
+              document.querySelector(".navbar-collapse").classList.remove("show");
+          });
+      });
+
+      // ✅ Navbar Collapse: Tutup saat klik di luar navbar
+      document.addEventListener("click", function (event) {
+          let navbar = document.querySelector(".navbar-collapse");
+          let navbarToggler = document.querySelector(".navbar-toggler");
+          if (!navbar.contains(event.target) && !navbarToggler.contains(event.target)) {
+              navbar.classList.remove("show");
+          }
+      });
+
+      // ✅ Dropdown Profile: Pastikan tetap bisa dibuka setelah pindah halaman
+      let dropdownButton = document.getElementById("dropdownMenuButton1");
+      if (dropdownButton) {
+          dropdownButton.addEventListener("click", function (event) {
+              let dropdownMenu = new bootstrap.Dropdown(dropdownButton);
+              dropdownMenu.toggle();
+              event.stopPropagation();
+          });
+      }
+
+      // ✅ Dropdown Profile: Tutup saat klik di luar
+      document.addEventListener("click", function (event) {
+          let dropdown = document.querySelector(".dropdown-menu");
+          if (dropdown && !dropdown.contains(event.target) && !dropdownButton.contains(event.target)) {
+              let openDropdown = bootstrap.Dropdown.getInstance(dropdownButton);
+              if (openDropdown) {
+                  openDropdown.hide();
+              }
+          }
+      });
+
+  
+
+      // SweetAlert2 for logout confirmation
+      if (document.getElementById("logout-button")) {
+          document.getElementById("logout-button").addEventListener("click", function(event) {
+              event.preventDefault();
+              Swal.fire({
+                  title: "Are you sure?",
+                  text: "You will be logged out from your account.",
+                  icon: "warning",
+                  showCancelButton: true,
+                  confirmButtonColor: "#d33",
+                  cancelButtonColor: "#3085d6",
+                  confirmButtonText: "Yes, Log Out"
+              }).then((result) => {
+                  if (result.isConfirmed) {
+                      document.getElementById("logout-form").submit();
+                  }
+              });
+          });
+      }
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+</body>
+</html>

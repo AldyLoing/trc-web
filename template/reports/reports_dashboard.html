@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Laporan Pengelolaan Sampah</h2>
+
+    <!-- Filter Form -->
+    <form method="GET" class="mb-3">
+        <label for="year">Filter Tahun:</label>
+        <input type="number" name="year" class="form-control mb-2" placeholder="YYYY" min="2020" max="2030" value="{{ request.GET.year }}">
+        
+        <label for="month">Filter Bulan:</label>
+        <select name="month" class="form-control mb-2">
+            <option value="">Semua Bulan</option>
+            {% for i in months %}
+                <option value="{{ i }}" {% if request.GET.month == i|stringformat:"i" %}selected{% endif %}>
+                    {{ i }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <button type="submit" class="btn btn-primary w-100">Filter</button>
+    </form>
+
+    <!-- Statistik Total -->
+    <div class="row">
+        <div class="col-md-6">
+            <h4 class="text-success">Total Sampah Terkumpul: {{ total_weight }} kg</h4>
+        </div>
+        <div class="col-md-6">
+            <h4 class="text-warning">Total Poin Diberikan: {{ total_points }}</h4>
+        </div>
+    </div>
+
+    <!-- Tombol Export -->
+    <a href="{% url 'export_reports_csv' %}" class="btn btn-info mb-3">Export CSV</a>
+
+    <!-- Grafik Total Berat Sampah Per Kategori -->
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5 class="card-title">Total Waste Collection by Category</h5>
+            <canvas id="wasteBarChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Grafik Pie Chart Sampah Per Kategori -->
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5 class="card-title">Waste Distribution by Category</h5>
+            <canvas id="wastePieChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Detail Transaksi -->
+    <h3 class="mt-4">Detail Transaksi</h3>
+    <table class="table table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Nama</th>
+                <th>Kategori</th>
+                <th>Berat (kg)</th>
+                <th>Poin</th>
+                <th>Tanggal</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transaction in transactions %}
+            <tr>
+                <td>{{ transaction.user.username }}</td>
+                <td>{{ transaction.category }}</td>
+                <td>{{ transaction.weight_kg }}</td>
+                <td>{{ transaction.points }}</td>
+                <td>{{ transaction.date|date:"d M Y" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="text-center">Tidak ada transaksi</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Tambahkan Chart.js untuk grafik -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let barCtx = document.getElementById('wasteBarChart').getContext('2d');
+        let pieCtx = document.getElementById('wastePieChart').getContext('2d');
+    
+        // ✅ Gunakan JSON untuk menghindari error format
+        let categoryData = JSON.parse('{{ category_data|escapejs }}');
+
+        console.log("Category Data:", categoryData);  // ✅ Debugging di Console Browser
+
+        if (Array.isArray(categoryData) && categoryData.length > 0) {
+            let categoryLabels = categoryData.map(data => data.category);
+            let categoryWeights = categoryData.map(data => data.total_weight);
+
+            let backgroundColors = ['#f39c12', '#3498db', '#e74c3c', '#2ecc71', '#9b59b6', '#ff5733', '#17a589'];
+
+            // ✅ Bar Chart
+            new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: categoryLabels,
+                    datasets: [{
+                        label: 'Total Berat Sampah (kg)',
+                        data: categoryWeights,
+                        backgroundColor: backgroundColors,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // ✅ Pie Chart
+            new Chart(pieCtx, {
+                type: 'pie',
+                data: {
+                    labels: categoryLabels,
+                    datasets: [{
+                        label: 'Total Berat Sampah (kg)',
+                        data: categoryWeights,
+                        backgroundColor: backgroundColors,
+                    }]
+                },
+                options: {
+                    responsive: true
+                }
+            });
+        } else {
+            console.warn("⚠️ Tidak ada data kategori untuk ditampilkan dalam grafik.");
+            document.getElementById("wasteBarChart").style.display = "none";
+            document.getElementById("wastePieChart").style.display = "none";
+        }
+    });
+</script>
+
+
+{% endblock %}

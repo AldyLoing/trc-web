@@ -1,0 +1,342 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-4 animate__animated animate__fadeIn">
+    <div class="d-flex align-items-center justify-content-center mb-5">
+        <div class="me-3">
+            <div class="icon-circle bg-primary-light">
+                <i class="fas fa-gift text-primary"></i>
+            </div>
+        </div>
+        <h1 class="h3 mb-0 text-center">
+            <span class="d-block text-dark fw-bold">Manage Point Redemptions</span>
+            <small class="text-muted fs-6">Review and process reward requests</small>
+        </h1>
+    </div>
+
+    <!-- Notification Messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {{ message.tags }} alert-dismissible fade show mb-4 border-0 shadow-sm" role="alert">
+                <div class="d-flex align-items-center">
+                    <i class="fas {% if message.tags == 'alert-success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %} me-3 fs-4"></i>
+                    <div class="flex-grow-1">{{ message }}</div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Main Card -->
+    <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="card-header bg-white py-3 border-bottom">
+            <div class="d-flex align-items-center justify-content-between">
+                <h5 class="mb-0 fw-semibold text-dark">
+                    <i class="fas fa-clock text-amber me-2"></i> Pending Requests
+                </h5>
+                <span class="badge bg-amber-soft text-amber rounded-pill px-3 py-2">
+                    {{ pending_requests|length }} requests
+                </span>
+            </div>
+        </div>
+        
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4 text-muted fw-semibold">Member</th>
+                            <th class="text-center text-muted fw-semibold">Points</th>
+                            <th class="text-center text-muted fw-semibold">Status</th>
+                            <th class="pe-4 text-end text-muted fw-semibold">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="redemption-table-body">
+                        {% for redemption in pending_requests %}
+                        <tr class="animate__animated animate__fadeIn">
+                            <td class="ps-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="symbol symbol-40 symbol-circle me-3">
+                                        <span class="symbol-label bg-primary-soft text-primary fs-5 fw-bold">
+                                            {{ redemption.user.username|first|upper }}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <span class="d-block fw-semibold text-dark">{{ redemption.user.username }}</span>
+                                        <small class="text-muted">Requested on {{ redemption.request_date|date:"M d, Y" }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <span class="fw-bold text-danger">-{{ redemption.points }}</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-amber-soft text-amber rounded-pill px-3 py-2">
+                                    <i class="fas fa-clock me-1"></i> Pending
+                                </span>
+                            </td>
+                            <td class="pe-4 text-end">
+                                <form method="POST" class="d-inline-flex action-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="redemption_id" value="{{ redemption.id }}">
+                                    <button type="submit" name="action" value="approve" class="btn btn-success btn-action me-2">
+                                        <i class="fas fa-check me-1"></i> Approve
+                                    </button>
+                                    <button type="submit" name="action" value="reject" class="btn btn-outline-danger btn-action">
+                                        <i class="fas fa-times me-1"></i> Reject
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center py-5">
+                                <div class="empty-state">
+                                    <i class="fas fa-inbox fs-1 text-muted mb-3"></i>
+                                    <p class="text-muted mb-0">No pending redemption requests</p>
+                                    <small class="text-muted">All requests have been processed</small>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-color: #2E7D32;
+        --primary-light: #E8F5E9;
+        --secondary-color: #0288D1;
+        --amber: #FFA000;
+        --amber-soft: #FFF8E1;
+        --light-gray: #f8f9fa;
+        --medium-gray: #e9ecef;
+        --dark-gray: #495057;
+    }
+    
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f5f7fa;
+    }
+    
+    /* Icon Circle */
+    .icon-circle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+    
+    .bg-primary-light {
+        background-color: var(--primary-light);
+    }
+    
+    /* Card Styling */
+    .card {
+        border: none;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .card-header {
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    /* Table Styling */
+    .table {
+        margin-bottom: 0;
+    }
+    
+    .table thead th {
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+    
+    .table tbody tr {
+        transition: all 0.3s ease;
+        border-bottom: 1px solid rgba(0,0,0,0.03);
+    }
+    
+    .table tbody tr:last-child {
+        border-bottom: none;
+    }
+    
+    .table tbody tr:hover {
+        background-color: rgba(0,0,0,0.02);
+        transform: translateX(2px);
+    }
+    
+    /* Badge Styling */
+    .badge {
+        font-weight: 500;
+        padding: 0.35em 0.65em;
+    }
+    
+    .bg-amber-soft {
+        background-color: var(--amber-soft);
+    }
+    
+    .text-amber {
+        color: var(--amber);
+    }
+    
+    /* Button Styling */
+    .btn-action {
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border-width: 2px;
+    }
+    
+    .btn-success {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    
+    .btn-success:hover {
+        background-color: #1B5E20;
+        border-color: #1B5E20;
+        transform: translateY(-1px);
+    }
+    
+    .btn-outline-danger {
+        color: #dc3545;
+        border-color: #dc3545;
+    }
+    
+    .btn-outline-danger:hover {
+        background-color: #dc3545;
+        color: white;
+        transform: translateY(-1px);
+    }
+    
+    /* User Avatar */
+    .symbol {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    
+    .symbol-circle {
+        border-radius: 50%;
+    }
+    
+    .symbol-40 {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .symbol-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+    }
+    
+    /* Empty State */
+    .empty-state {
+        padding: 2rem;
+        text-align: center;
+    }
+    
+    /* Animations */
+    .animate__animated {
+        animation-duration: 0.5s;
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .table-responsive {
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        
+        .table thead {
+            display: none;
+        }
+        
+        .table tbody tr {
+            display: block;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .table tbody td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border: none;
+            text-align: right;
+        }
+        
+        .table tbody td::before {
+            content: attr(data-label);
+            font-weight: 600;
+            color: var(--dark-gray);
+            margin-right: auto;
+            padding-right: 1rem;
+            text-align: left;
+        }
+        
+        .table tbody td:first-child {
+            padding-top: 1rem;
+        }
+        
+        .table tbody td:last-child {
+            padding-bottom: 1rem;
+        }
+        
+        .btn-action {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+        
+        .action-form {
+            flex-direction: column;
+            width: 100%;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Add animation to table rows
+        document.querySelectorAll("#redemption-table-body tr").forEach((row, index) => {
+            row.style.animationDelay = `${index * 0.05}s`;
+        });
+        
+        // Reject button functionality
+        document.querySelectorAll(".reject-btn").forEach(button => {
+            button.addEventListener("click", function (event) {
+                setTimeout(() => {
+                    updateBalance();
+                }, 2000);
+            });
+        });
+
+        function updateBalance() {
+            fetch("{% url 'get_updated_balance' %}")
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("total-points").innerHTML = `<i class="fas fa-coins"></i> ${data.user_points} Points`;
+                })
+                .catch(error => console.error("Error updating balance:", error));
+        }
+    });
+</script>
+
+{% endblock %}
