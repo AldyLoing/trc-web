@@ -4,6 +4,10 @@ from django.contrib.messages import constants as messages
 from django.utils.translation import gettext_lazy as _
 import environ
 
+
+env = environ.Env()
+environ.Env.read_env()
+
 # Inisialisasi objek untuk membaca file .env
 env = environ.Env()
 
