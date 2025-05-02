@@ -2,6 +2,18 @@ import os
 from pathlib import Path
 from django.contrib.messages import constants as messages
 from django.utils.translation import gettext_lazy as _
+import environ
+
+# Inisialisasi objek untuk membaca file .env
+env = environ.Env()
+
+# Membaca file .env (harus berada di root direktori proyek)
+environ.Env.read_env()
+
+# Pengaturan DATABASES menggunakan variabel lingkungan (DATABASE_URL)
+DATABASES = {
+    'default': env.db(),  # Menggunakan DATABASE_URL dari variabel lingkungan
+}
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -14,9 +26,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-wz*anr^^n=o&-qiin@4-#(au1ly=4gvgjcy395xu%33(t$ok5j'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['.onrender.com']
+ALLOWED_HOSTS = ['https://trc-web.up.railway.app', 'localhost']
 
 
 # Application definition
@@ -66,12 +78,7 @@ WSGI_APPLICATION = 'Blog.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+
 
 
 # Password validation
@@ -114,11 +121,15 @@ LOGOUT_REDIRECT_URL = 'index'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = 'static/'
 
 STATICFILES_DIRS =  [
     os.path.join(BASE_DIR, 'static'),
 ]
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
